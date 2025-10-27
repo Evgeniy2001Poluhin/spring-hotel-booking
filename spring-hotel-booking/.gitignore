@@ -1,0 +1,18 @@
+# === build artifacts ===
+**/target/
+
+# === logs ===
+*.log
+.*.log
+logs/
+
+# === macOS / IDE ===
+.DS_Store
+.idea/
+*.iml
+
+# === backup/temp files ===
+*.bak
+*.bak_*
+*.old
+*.tmp
