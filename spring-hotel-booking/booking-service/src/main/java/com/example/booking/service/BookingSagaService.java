@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.example.booking.domain.Booking;
 import com.example.booking.domain.BookingStatus;
 import com.example.booking.repo.BookingRepository;
-import com.example.booking.web.dto.BookingDto;
-import com.example.booking.web.dto.CreateBookingRequest;
+import com.example.booking.dto.BookingDto;
+import com.example.booking.dto.CreateBookingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -33,7 +33,7 @@ public class BookingSagaService {
 
     @Transactional
     public BookingDto create(CreateBookingRequest req) {
-        String requestId = Optional.ofNullable(req.requestId()).orElse(UUID.randomUUID().toString());
+        String requestId = Optional.ofNullable(req.getRequestId()).orElse(UUID.randomUUID().toString());
 
         // идемпотентность на нашем уровне
         var existing = bookings.findByRequestId(requestId);
@@ -42,16 +42,16 @@ public class BookingSagaService {
         }
 
         var b = new Booking();
-        b.setUserId(req.userId());
-        b.setStartDate(req.startDate());
-        b.setEndDate(req.endDate());
+        b.setUserId(req.getUserId());
+        b.setStartDate(req.getStartDate());
+        b.setEndDate(req.getEndDate());
         b.setStatus(BookingStatus.PENDING);
         b.setRequestId(requestId);
 
         // Если не указан roomId или autoSelect=true — спросим у Hotel рекомендации
-        Long roomId = req.roomId();
-        if (Boolean.TRUE.equals(req.autoSelect()) || roomId == null) {
-            roomId = autoSelectRoom(req.startDate(), req.endDate());
+        Long roomId = req.getRoomId();
+        if (Boolean.TRUE.equals(req.getAutoSelect()) || roomId == null) {
+            roomId = autoSelectRoom(req.getStartDate(), req.getEndDate());
             if (roomId == null) {
                 b.setStatus(BookingStatus.CANCELLED);
                 bookings.save(b);
@@ -64,7 +64,7 @@ public class BookingSagaService {
         // Шаг 2: confirm-availability с ретраями
         boolean confirmed = false;
         try {
-            confirmed = confirmAvailabilityWithRetry(roomId, requestId, b.getId(), req.startDate(), req.endDate());
+            confirmed = confirmAvailabilityWithRetry(roomId, requestId, b.getId(), req.getStartDate(), req.getEndDate());
         } catch (Exception e) {
             log.warn("confirm-availability failed: {}", e.toString());
         }

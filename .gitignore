@@ -1,0 +1,14 @@
+# build
+**/target/
+# IDE/OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+# logs & backups
+*.log
+.*.log
+*.bak
+*.bak_*
+# local env files (на всякий)
+.env

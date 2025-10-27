@@ -1,6 +1,8 @@
 package com.example.booking.service;
 
 import com.example.booking.domain.Booking;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.example.booking.dto.BookingDto;
 import com.example.booking.dto.CreateBookingRequest;
 import com.example.booking.repo.BookingRepository;
@@ -18,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class BookingService {
+    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     private final BookingRepository bookingRepository;
     private final HotelClient hotelClient;
