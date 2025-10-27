@@ -1,0 +1,61 @@
+package com.example.booking.domain;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+
+@Entity
+@Table(name = "bookings")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
+public class Booking {
+
+    public enum Status { PENDING, CONFIRMED, CANCELLED }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Long userId;
+    private Long roomId;
+
+    private LocalDate startDate;
+    private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.PENDING;
+
+    private OffsetDateTime createdAt = OffsetDateTime.now();
+
+    // ---- Статический конструктор "нового" бронирования ----
+    public static Booking pending(Long userId,
+                                  Long roomId,
+                                  LocalDate startDate,
+                                  LocalDate endDate,
+                                  String requestId /* не сохраняем, но оставим сигнатуру */) {
+        Booking b = new Booking();
+        b.setUserId(userId);
+        b.setRoomId(roomId);
+        b.setStartDate(startDate);
+        b.setEndDate(endDate);
+        b.setStatus(Status.PENDING);
+        b.setCreatedAt(OffsetDateTime.now());
+        return b;
+    }
+
+    // ---- Доменные переходы статуса ----
+    public void confirm() {
+        this.status = Status.CONFIRMED;
+    }
+
+    public void cancel() {
+        this.status = Status.CANCELLED;
+    }
+}
